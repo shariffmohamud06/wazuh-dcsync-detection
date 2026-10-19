@@ -1,0 +1,21 @@
+<group name="dcsync_local,">
+
+  <!-- Rule 100100: DCSync detection -->
+  <!-- Fires on event 4662 containing any of the three AD replication-rights GUIDs -->
+  <rule id="100100" level="12">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties" type="pcre2">1131f6aa-9c07-11d1-f79f-00c04fc2dcd2|1131f6ad-9c07-11d1-f79f-00c04fc2dcd2|89e95b76-444d-4c62-991a-0facbeda640c</field>
+    <description>Possible DCSync attack: replication rights requested (4662)</description>
+    <group>attack,dcsync,mitre_t1003_006,</group>
+  </rule>
+
+  <!-- Rule 100101: suppress legitimate machine-account (DC-to-DC) replication -->
+  <!-- SubjectUserName ending in '$' is a computer account -->
+  <rule id="100101" level="0">
+    <if_sid>100100</if_sid>
+    <field name="win.eventdata.subjectUserName" type="pcre2">\$$</field>
+    <description>Legitimate replication from machine account - suppressed</description>
+  </rule>
+
+</group>
